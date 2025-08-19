@@ -13,14 +13,22 @@ with st.sidebar.form("form_datos"):
     num_booleans = st.slider("Columnas Booleanas", min_value=0, max_value=5, value=1)
     num_fechas = st.slider("Columnas de Fecha", min_value=0, max_value=5, value=1)
     porcentaje_nulos = st.slider("% de nulos/vacíos en los datos", min_value=0, max_value=100, value=0)
-    idioma_opcion = st.selectbox("Idioma de los strings", options=["Español", "Inglés"], index=0)
+    idiomas_disponibles = {
+        "Español": "es_ES",
+        "Inglés": "en_US",
+        "Francés": "fr_FR",
+        "Alemán": "de_DE",
+        "Italiano": "it_IT",
+        "Portugués": "pt_BR"
+    }
+    idioma_opcion = st.selectbox("Idioma", options=list(idiomas_disponibles.keys()), index=0)
     generar = st.form_submit_button("Generar")
 
 df = None
 
 if generar:
     np.random.seed(int(semilla))
-    idioma = 'es_ES' if idioma_opcion == "Español" else 'en_US'
+    idioma = idiomas_disponibles[idioma_opcion]
     fake = Faker(idioma)
     Faker.seed(int(semilla))
 
