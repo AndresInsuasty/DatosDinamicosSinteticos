@@ -27,16 +27,12 @@ with st.sidebar:
                 options=list(PLANTILLAS_DISPONIBLES.keys()),
                 help="Plantillas predefinidas con estructuras de datos específicas"
             )
-            
-            # Mostrar descripción de la plantilla
-            if plantilla_seleccionada:
-                plantilla_clase = PLANTILLAS_DISPONIBLES[plantilla_seleccionada]
-                st.info(plantilla_clase(1, 42).descripcion)
         
         # Parámetros comunes para ambos modos
         num_filas = st.number_input("Número de registros (filas)", min_value=1, value=10)
         semilla = st.number_input("Número de la suerte (semilla)", min_value=0, value=42)
         porcentaje_nulos = st.slider("% de nulos/vacíos en los datos", min_value=0, max_value=100, value=0)
+        idioma_opcion = st.selectbox("Idioma", options=list(IDIOMAS_DISPONIBLES.keys()), index=0)
         
         # Parámetros específicos para modo personalizado
         if modo == "Personalizado":
@@ -44,13 +40,13 @@ with st.sidebar:
             num_strings = st.slider("Columnas de Texto", min_value=0, max_value=5, value=2)
             num_booleans = st.slider("Columnas Booleanas", min_value=0, max_value=5, value=1)
             num_fechas = st.slider("Columnas de Fecha", min_value=0, max_value=5, value=1)
-            idioma_opcion = st.selectbox("Idioma", options=list(IDIOMAS_DISPONIBLES.keys()), index=0)
         
         generar = st.form_submit_button("Generar")
 
 if generar:
+    idioma = IDIOMAS_DISPONIBLES[idioma_opcion]
+    
     if modo == "Personalizado":
-        idioma = IDIOMAS_DISPONIBLES[idioma_opcion]
         df = generar_dataframe(
             num_filas=int(num_filas),
             semilla=int(semilla),
@@ -66,7 +62,8 @@ if generar:
         plantilla = plantilla_clase(
             num_filas=int(num_filas),
             semilla=int(semilla),
-            porcentaje_nulos=int(porcentaje_nulos)
+            porcentaje_nulos=int(porcentaje_nulos),
+            idioma=idioma
         )
         df = plantilla.generar()
     

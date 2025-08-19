@@ -14,7 +14,7 @@ class PlantillaGastosPersonales(PlantillaBase):
         return "Registro de gastos personales con categorías, montos y fechas"
     
     def generar(self) -> pd.DataFrame:
-        fake = Faker('es_ES')
+        fake = Faker(self.idioma)
         fake.seed_instance(self.semilla)
         np.random.seed(self.semilla)
         

@@ -14,7 +14,7 @@ class PlantillaVentasSupermercado(PlantillaBase):
         return "Registro de ventas de supermercado con productos, precios y cantidades"
     
     def generar(self) -> pd.DataFrame:
-        fake = Faker('es_ES')
+        fake = Faker(self.idioma)
         fake.seed_instance(self.semilla)
         np.random.seed(self.semilla)
         

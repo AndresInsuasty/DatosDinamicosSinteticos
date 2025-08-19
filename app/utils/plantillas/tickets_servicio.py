@@ -14,7 +14,7 @@ class PlantillaTicketsServicio(PlantillaBase):
         return "Tickets de soporte técnico con estados, prioridades y asignaciones"
     
     def generar(self) -> pd.DataFrame:
-        fake = Faker('es_ES')
+        fake = Faker(self.idioma)
         fake.seed_instance(self.semilla)
         np.random.seed(self.semilla)
         

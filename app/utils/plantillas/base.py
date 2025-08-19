@@ -4,10 +4,11 @@ import pandas as pd
 class PlantillaBase(ABC):
     """Clase base abstracta para todas las plantillas de datos sintéticos."""
     
-    def __init__(self, num_filas: int, semilla: int, porcentaje_nulos: int = 0):
+    def __init__(self, num_filas: int, semilla: int, porcentaje_nulos: int = 0, idioma: str = 'es_ES'):
         self.num_filas = num_filas
         self.semilla = semilla
         self.porcentaje_nulos = porcentaje_nulos
+        self.idioma = idioma
     
     @abstractmethod
     def generar(self) -> pd.DataFrame:
