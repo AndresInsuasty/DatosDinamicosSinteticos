@@ -24,7 +24,7 @@ with st.sidebar:
         if modo == "Plantillas":
             plantilla_seleccionada = st.selectbox(
                 "Selecciona una plantilla:",
-                options=list(PLANTILLAS_DISPONIBLES.keys()),
+                options=sorted(list(PLANTILLAS_DISPONIBLES.keys())),
                 help="Plantillas predefinidas con estructuras de datos específicas"
             )
         
