@@ -1,8 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from faker import Faker
 import io
+
+from utils.generacion import generar_dataframe
+from utils.descargas import (
+    preparar_csv, preparar_excel, preparar_json, preparar_parquet, preparar_sqlite
+)
+from config.constantes import IDIOMAS_DISPONIBLES
 
 st.title("Generador de Datos Sintéticos")
 
@@ -14,71 +19,24 @@ with st.sidebar.form("form_datos"):
     num_booleans = st.slider("Columnas Booleanas", min_value=0, max_value=5, value=1)
     num_fechas = st.slider("Columnas de Fecha", min_value=0, max_value=5, value=1)
     porcentaje_nulos = st.slider("% de nulos/vacíos en los datos", min_value=0, max_value=100, value=0)
-    idiomas_disponibles = {
-        "Español": "es_ES",
-        "Inglés": "en_US",
-        "Francés": "fr_FR",
-        "Alemán": "de_DE",
-        "Italiano": "it_IT",
-        "Portugués": "pt_BR"
-    }
-    idioma_opcion = st.selectbox("Idioma", options=list(idiomas_disponibles.keys()), index=0)
+    idioma_opcion = st.selectbox("Idioma", options=list(IDIOMAS_DISPONIBLES.keys()), index=0)
     generar = st.form_submit_button("Generar")
 
 if generar:
-    np.random.seed(int(semilla))
-    idioma = idiomas_disponibles[idioma_opcion]
-    fake = Faker(idioma)
-    Faker.seed(int(semilla))
+    idioma = IDIOMAS_DISPONIBLES[idioma_opcion]
+    df = generar_dataframe(
+        num_filas=int(num_filas),
+        semilla=int(semilla),
+        num_numericas=int(num_numericas),
+        num_strings=int(num_strings),
+        num_booleans=int(num_booleans),
+        num_fechas=int(num_fechas),
+        porcentaje_nulos=int(porcentaje_nulos),
+        idioma=idioma
+    )
+    st.session_state.df = df
+    st.session_state.df_sample = df.sample(min(10, len(df)), random_state=int(semilla))
 
-    data = {}
-    n_filas = int(num_filas)
-    n_nulos = int(n_filas * porcentaje_nulos / 100)
-
-    # Columnas numéricas
-    for i in range(int(num_numericas)):
-        col_name = f"num_{i+1}"
-        col_data = np.random.randn(n_filas)
-        if n_nulos > 0:
-            idx = np.random.choice(n_filas, n_nulos, replace=False)
-            col_data[idx] = np.nan
-        data[col_name] = col_data
-
-    # Columnas string
-    for i in range(int(num_strings)):
-        col_name = f"str_{i+1}"
-        col_data = [fake.word() for _ in range(n_filas)]
-        if n_nulos > 0:
-            idx = np.random.choice(n_filas, n_nulos, replace=False)
-            for j in idx:
-                col_data[j] = None
-        data[col_name] = col_data
-
-    # Columnas booleanas
-    for i in range(int(num_booleans)):
-        col_name = f"bool_{i+1}"
-        col_data = np.random.choice([True, False], size=n_filas)
-        if n_nulos > 0:
-            idx = np.random.choice(n_filas, n_nulos, replace=False)
-            col_data[idx] = None
-        data[col_name] = col_data
-
-    # Columnas de fecha
-    for i in range(int(num_fechas)):
-        col_name = f"fecha_{i+1}"
-        col_data = [fake.date_between(start_date='-5y', end_date='today') for _ in range(n_filas)]
-        if n_nulos > 0:
-            idx = np.random.choice(n_filas, n_nulos, replace=False)
-            for j in idx:
-                col_data[j] = None
-        data[col_name] = col_data
-
-    df = pd.DataFrame(data)
-    st.session_state.df = df  # Guarda el DataFrame en el estado de sesión
-    st.session_state.df_sample = df.sample(10, random_state=int(semilla))
-
-
-# Usa el DataFrame guardado en el estado de sesión para mostrar y descargar
 if "df" in st.session_state and "df_sample" in st.session_state:
     df = st.session_state.df
     sample_df = st.session_state.df_sample
@@ -87,9 +45,9 @@ if "df" in st.session_state and "df_sample" in st.session_state:
 
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
-        formato_csv = st.checkbox("CSV", value=True)
+        formato_csv = st.checkbox("CSV", value=True, key="csv_checkbox")
         if formato_csv:
-            csv = df.to_csv(index=False).encode('utf-8')
+            csv = preparar_csv(df)
             st.download_button(
                 label="Descargar CSV",
                 data=csv,
@@ -97,11 +55,9 @@ if "df" in st.session_state and "df_sample" in st.session_state:
                 mime="text/csv"
             )
     with col2:
-        formato_excel = st.checkbox("Excel", value=False)
+        formato_excel = st.checkbox("Excel", value=False, key="excel_checkbox")
         if formato_excel:
-            buffer = io.BytesIO()
-            df.to_excel(buffer, index=False, engine='openpyxl')
-            buffer.seek(0)
+            buffer = preparar_excel(df)
             st.download_button(
                 label="Descargar Excel",
                 data=buffer,
@@ -109,9 +65,9 @@ if "df" in st.session_state and "df_sample" in st.session_state:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
     with col3:
-        formato_json = st.checkbox("JSON", value=False)
+        formato_json = st.checkbox("JSON", value=False, key="json_checkbox")
         if formato_json:
-            json = df.to_json(orient="records", force_ascii=False).encode('utf-8')
+            json = preparar_json(df)
             st.download_button(
                 label="Descargar JSON",
                 data=json,
@@ -119,11 +75,9 @@ if "df" in st.session_state and "df_sample" in st.session_state:
                 mime="application/json"
             )
     with col4:
-        formato_parquet = st.checkbox("Parquet", value=False)
+        formato_parquet = st.checkbox("Parquet", value=False, key="parquet_checkbox")
         if formato_parquet:
-            buffer_parquet = io.BytesIO()
-            df.to_parquet(buffer_parquet, index=False)
-            buffer_parquet.seek(0)
+            buffer_parquet = preparar_parquet(df)
             st.download_button(
                 label="Descargar Parquet",
                 data=buffer_parquet,
@@ -131,22 +85,13 @@ if "df" in st.session_state and "df_sample" in st.session_state:
                 mime="application/octet-stream"
             )
     with col5:
-        formato_sqlite = st.checkbox("SQLite", value=False)
+        formato_sqlite = st.checkbox("SQLite", value=False, key="sqlite_checkbox")
         if formato_sqlite:
-            import sqlite3
-            buffer_sqlite = io.BytesIO()
-            # Crear base de datos en memoria y exportar a buffer
-            conn = sqlite3.connect(':memory:')
-            df.to_sql('datos_sinteticos', conn, index=False, if_exists='replace')
-            # Dump de la base de datos a buffer
-            for line in conn.iterdump():
-                buffer_sqlite.write(f"{line}\n".encode('utf-8'))
-            buffer_sqlite.seek(0)
-            conn.close()
+            buffer_sqlite = preparar_sqlite(df)
             st.download_button(
                 label="Descargar SQLite",
                 data=buffer_sqlite,
-                file_name="datos_sinteticos.sqlite",
+                file_name="datos_sinteticos.db",
                 mime="application/x-sqlite3"
             )
 
