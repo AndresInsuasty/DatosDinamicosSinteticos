@@ -1,21 +1,29 @@
-import pytest
-import pandas as pd
-import sys
-import os
+"""Tests para integración del sistema."""
+
 import io
+import os
+import sys
+
+import pandas as pd
+import pytest
 
 # Agregar el directorio de la app al path para imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'app'))
 
-from app.utils.generacion import generar_dataframe
-from app.utils.descargas import preparar_csv, preparar_excel, preparar_json, preparar_parquet, preparar_sqlite
 from app.config.constantes import IDIOMAS_DISPONIBLES
+from app.utils.descargas import (
+    preparar_csv, preparar_excel, preparar_json,
+    preparar_parquet, preparar_sqlite
+)
+from app.utils.generacion import generar_dataframe
+
 
 class TestIntegracion:
-    
+    """Tests de integración del sistema."""
+
     def test_generacion_personalizada_completa(self):
         """Test generación de datos personalizados con todos los tipos."""
-        df = generar_dataframe(
+        dataframe = generar_dataframe(
             num_filas=25,
             semilla=42,
             num_numericas=2,
@@ -25,15 +33,15 @@ class TestIntegracion:
             porcentaje_nulos=0,
             idioma='es_ES'
         )
-        
-        assert isinstance(df, pd.DataFrame)
-        assert len(df) == 25
-        assert len(df.columns) == 6  # 2+2+1+1
-    
+
+        assert isinstance(dataframe, pd.DataFrame)
+        assert len(dataframe) == 25
+        assert len(dataframe.columns) == 6  # 2+2+1+1
+
     def test_todos_los_idiomas_disponibles(self):
         """Test que todos los idiomas configurados funcionan."""
-        for idioma_nombre, idioma_codigo in IDIOMAS_DISPONIBLES.items():
-            df = generar_dataframe(
+        for idioma_codigo in IDIOMAS_DISPONIBLES.values():
+            dataframe = generar_dataframe(
                 num_filas=5,
                 semilla=123,
                 num_numericas=1,
@@ -43,10 +51,10 @@ class TestIntegracion:
                 porcentaje_nulos=0,
                 idioma=idioma_codigo
             )
-            
-            assert isinstance(df, pd.DataFrame)
-            assert len(df) == 5
-    
+
+            assert isinstance(dataframe, pd.DataFrame)
+            assert len(dataframe) == 5
+
     @pytest.mark.parametrize("formato,funcion", [
         ("csv", preparar_csv),
         ("excel", preparar_excel),
@@ -54,9 +62,9 @@ class TestIntegracion:
         ("parquet", preparar_parquet),
         ("sqlite", preparar_sqlite)
     ])
-    def test_exportacion_formatos(self, formato, funcion):
+    def test_exportacion_formatos(self, funcion):
         """Test exportación a diferentes formatos."""
-        df = generar_dataframe(
+        dataframe = generar_dataframe(
             num_filas=10,
             semilla=42,
             num_numericas=1,
@@ -66,11 +74,11 @@ class TestIntegracion:
             porcentaje_nulos=0,
             idioma='es_ES'
         )
-        
+
         # La función debe ejecutarse sin errores
-        resultado = funcion(df)
+        resultado = funcion(dataframe)
         assert resultado is not None
-        
+
         # Verificar según el tipo de resultado
         if isinstance(resultado, str):
             # Para CSV y JSON que retornan strings
@@ -86,7 +94,7 @@ class TestIntegracion:
         else:
             # Fallback: verificar que no sea None
             assert resultado is not None
-    
+
     def test_flujo_plantilla_completo(self, todas_las_plantillas):
         """Test flujo completo con plantillas y exportación."""
         plantilla_clase = todas_las_plantillas["Gastos Personales"]
@@ -96,15 +104,15 @@ class TestIntegracion:
             porcentaje_nulos=5,
             idioma='es_ES'
         )
-        
-        # Generar datos
-        df = plantilla.generar()
-        assert isinstance(df, pd.DataFrame)
-        assert len(df) == 15
-        
-        # Probar exportación
-        csv_data = preparar_csv(df)
+
+        dataframe = plantilla.generar()
+        assert isinstance(dataframe, pd.DataFrame)
+        assert len(dataframe) == 15
+
+        # Test exportación
+        csv_data = preparar_csv(dataframe)
+        assert isinstance(csv_data, str)
         assert len(csv_data) > 0
-        
-        json_data = preparar_json(df)
+
+        json_data = preparar_json(dataframe)
         assert len(json_data) > 0

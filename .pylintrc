@@ -1,0 +1,39 @@
+[MASTER]
+# Archivos a ignorar
+ignore-paths=fix_pylint_issues.py
+
+[MESSAGES CONTROL]
+# Deshabilitar algunos checks problemáticos con la versión actual de Pylint/Astroid
+disable=astroid-error,
+        import-error,
+        no-member,
+        cyclic-import,
+        unused-import
+
+[FORMAT]
+# Longitud máxima de línea
+max-line-length=100
+
+# Número de espacios para la indentación
+indent-string='    '
+
+[VARIABLES]
+# Variables con nombres aceptables (incluyendo 'df' para DataFrames)
+good-names=i,j,k,ex,Run,_,df,id
+
+[DESIGN]
+# Número máximo de argumentos para función/método
+max-args=5
+
+# Número máximo de variables locales para función/método
+max-locals=15
+
+[BASIC]
+# Expresión regular para nombres de variables válidos
+variable-rgx=[a-z_][a-z0-9_]{2,30}$
+
+# Expresión regular para nombres de constantes válidos
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+
+# Expresión regular para nombres de clases válidos
+class-rgx=[A-Z_][a-zA-Z0-9]+$

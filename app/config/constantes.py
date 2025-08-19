@@ -1,3 +1,5 @@
+"""Módulo constantes."""
+
 IDIOMAS_DISPONIBLES = {
     "Español": "es_ES",
     "Inglés": "en_US",

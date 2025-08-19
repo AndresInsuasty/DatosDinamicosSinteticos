@@ -1,12 +1,14 @@
+"""Módulo de plantillas para generación de datos sintéticos."""
+
 from .base import PlantillaBase
+from .educacion_estudiantes import PlantillaEducacionEstudiantes
+from .finanzas_personales import PlantillaFinanzasPersonales
 from .gastos_personales import PlantillaGastosPersonales
-from .ventas_supermercado import PlantillaVentasSupermercado
+from .marketing_digital import PlantillaMarketingDigital
+from .recursos_humanos import PlantillaRecursosHumanos
 from .tickets_servicio import PlantillaTicketsServicio
 from .ventas_ecommerce import PlantillaVentasEcommerce
-from .recursos_humanos import PlantillaRecursosHumanos
-from .finanzas_personales import PlantillaFinanzasPersonales
-from .marketing_digital import PlantillaMarketingDigital
-from .educacion_estudiantes import PlantillaEducacionEstudiantes
+from .ventas_supermercado import PlantillaVentasSupermercado
 
 # Registro de plantillas disponibles
 PLANTILLAS_DISPONIBLES = {
