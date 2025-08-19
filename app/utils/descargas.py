@@ -49,3 +49,26 @@ def preparar_sqlite(df, tabla_nombre='datos_sinteticos'):
         # Limpiar archivo temporal
         if os.path.exists(temp_path):
             os.unlink(temp_path)
+
+def obtener_formatos_disponibles():
+    return {
+        "CSV": {"extension": ".csv", "mime": "text/csv", "icon": "📄"},
+        "Excel": {"extension": ".xlsx", "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "icon": "📊"},
+        "JSON": {"extension": ".json", "mime": "application/json", "icon": "📋"},
+        "Parquet": {"extension": ".parquet", "mime": "application/octet-stream", "icon": "🗜️"},
+        "SQLite": {"extension": ".db", "mime": "application/x-sqlite3", "icon": "🗃️"}
+    }
+
+def preparar_formato(df, formato):
+    if formato == "CSV":
+        return preparar_csv(df)
+    elif formato == "Excel":
+        return preparar_excel(df)
+    elif formato == "JSON":
+        return preparar_json(df)
+    elif formato == "Parquet":
+        return preparar_parquet(df)
+    elif formato == "SQLite":
+        return preparar_sqlite(df)
+    else:
+        raise ValueError(f"Formato no soportado: {formato}")

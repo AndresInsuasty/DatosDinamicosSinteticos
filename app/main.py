@@ -41,57 +41,57 @@ if "df" in st.session_state and "df_sample" in st.session_state:
     df = st.session_state.df
     sample_df = st.session_state.df_sample
     st.dataframe(sample_df)
-    st.write("Opciones de formato para descargar:")
-
+    
+    st.write("**Descargar datos en diferentes formatos:**")
     col1, col2, col3, col4, col5 = st.columns(5)
+    
     with col1:
-        formato_csv = st.checkbox("CSV", value=True, key="csv_checkbox")
-        if formato_csv:
-            csv = preparar_csv(df)
-            st.download_button(
-                label="Descargar CSV",
-                data=csv,
-                file_name="datos_sinteticos.csv",
-                mime="text/csv"
-            )
+        csv = preparar_csv(df)
+        st.download_button(
+            label="📄 CSV",
+            data=csv,
+            file_name="datos_sinteticos.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+    
     with col2:
-        formato_excel = st.checkbox("Excel", value=False, key="excel_checkbox")
-        if formato_excel:
-            buffer = preparar_excel(df)
-            st.download_button(
-                label="Descargar Excel",
-                data=buffer,
-                file_name="datos_sinteticos.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+        buffer = preparar_excel(df)
+        st.download_button(
+            label="📊 Excel",
+            data=buffer,
+            file_name="datos_sinteticos.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
+    
     with col3:
-        formato_json = st.checkbox("JSON", value=False, key="json_checkbox")
-        if formato_json:
-            json = preparar_json(df)
-            st.download_button(
-                label="Descargar JSON",
-                data=json,
-                file_name="datos_sinteticos.json",
-                mime="application/json"
-            )
+        json = preparar_json(df)
+        st.download_button(
+            label="📋 JSON",
+            data=json,
+            file_name="datos_sinteticos.json",
+            mime="application/json",
+            use_container_width=True
+        )
+    
     with col4:
-        formato_parquet = st.checkbox("Parquet", value=False, key="parquet_checkbox")
-        if formato_parquet:
-            buffer_parquet = preparar_parquet(df)
-            st.download_button(
-                label="Descargar Parquet",
-                data=buffer_parquet,
-                file_name="datos_sinteticos.parquet",
-                mime="application/octet-stream"
-            )
+        buffer_parquet = preparar_parquet(df)
+        st.download_button(
+            label="🗜️ Parquet",
+            data=buffer_parquet,
+            file_name="datos_sinteticos.parquet",
+            mime="application/octet-stream",
+            use_container_width=True
+        )
+    
     with col5:
-        formato_sqlite = st.checkbox("SQLite", value=False, key="sqlite_checkbox")
-        if formato_sqlite:
-            buffer_sqlite = preparar_sqlite(df)
-            st.download_button(
-                label="Descargar SQLite",
-                data=buffer_sqlite,
-                file_name="datos_sinteticos.db",
-                mime="application/x-sqlite3"
-            )
+        buffer_sqlite = preparar_sqlite(df)
+        st.download_button(
+            label="🗃️ SQLite",
+            data=buffer_sqlite,
+            file_name="datos_sinteticos.db",
+            mime="application/x-sqlite3",
+            use_container_width=True
+        )
 
