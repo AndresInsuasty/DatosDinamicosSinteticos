@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from faker import Faker
+import io
 
 st.title("Generador de Datos Sintéticos")
 
@@ -23,8 +24,6 @@ with st.sidebar.form("form_datos"):
     }
     idioma_opcion = st.selectbox("Idioma", options=list(idiomas_disponibles.keys()), index=0)
     generar = st.form_submit_button("Generar")
-
-df = None
 
 if generar:
     np.random.seed(int(semilla))
@@ -75,14 +74,36 @@ if generar:
         data[col_name] = col_data
 
     df = pd.DataFrame(data)
-    st.dataframe(df.sample(10))
+    st.session_state.df = df  # Guarda el DataFrame en el estado de sesión
+    st.session_state.df_sample = df.sample(10, random_state=int(semilla))
 
-if df is not None:
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="Descargar CSV",
-        data=csv,
-        file_name="datos_sinteticos.csv",
-        mime="text/csv"
-    )
+
+# Usa el DataFrame guardado en el estado de sesión para mostrar y descargar
+if "df" in st.session_state and "df_sample" in st.session_state:
+    df = st.session_state.df
+    sample_df = st.session_state.df_sample
+    st.dataframe(sample_df)
+    st.write("Opciones de formato para descargar:")
+    formato_csv = st.checkbox("CSV", value=True)
+    formato_excel = st.checkbox("Excel", value=False)
+    if formato_csv:
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Descargar CSV",
+            data=csv,
+            file_name="datos_sinteticos.csv",
+            mime="text/csv"
+        )
+    if formato_excel:
+        buffer = io.BytesIO()
+        df.to_excel(buffer, index=False, engine='openpyxl')
+        buffer.seek(0)
+        st.download_button(
+            label="Descargar Excel",
+            data=buffer,
+            file_name="datos_sinteticos.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+# Sí, se requiere openpyxl para exportar a Excel con pandas.
 
