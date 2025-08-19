@@ -12,13 +12,15 @@ with st.sidebar.form("form_datos"):
     num_strings = st.slider("Columnas de Texto", min_value=0, max_value=5, value=2)
     num_booleans = st.slider("Columnas Booleanas", min_value=0, max_value=5, value=1)
     num_fechas = st.slider("Columnas de Fecha", min_value=0, max_value=5, value=1)
+    idioma_opcion = st.selectbox("Idioma de los strings", options=["Español", "Inglés"], index=0)
     generar = st.form_submit_button("Generar")
 
 df = None
 
 if generar:
     np.random.seed(int(semilla))
-    fake = Faker()
+    idioma = 'es_ES' if idioma_opcion == "Español" else 'en_US'
+    fake = Faker(idioma)
     Faker.seed(int(semilla))
 
     data = {}
@@ -54,4 +56,4 @@ if df is not None:
         file_name="datos_sinteticos.csv",
         mime="text/csv"
     )
-   
+
