@@ -36,10 +36,7 @@ class PlantillaTicketsServicio(PlantillaBase):
         
         df = pd.DataFrame(data)
         
-        # Aplicar nulos si es necesario
-        if self.porcentaje_nulos > 0:
-            for col in ['asignado_a', 'tiempo_resolucion_hrs']:
-                mask = np.random.random(self.num_filas) < (self.porcentaje_nulos / 100)
-                df.loc[mask, col] = None
+        # Aplicar nulos si es necesario (excluir IDs y fechas críticas)
+        df = self._aplicar_nulos(df, columnas_excluir=['ticket_id', 'fecha_creacion'])
         
         return df

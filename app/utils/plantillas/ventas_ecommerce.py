@@ -42,9 +42,9 @@ class PlantillaVentasEcommerce(PlantillaBase):
         df = pd.DataFrame(data)
         df['roi'] = ((df['valor_pedido'] - df['costo_adquisicion']) / df['costo_adquisicion'] * 100).round(2)
         
-        if self.porcentaje_nulos > 0:
-            for col in ['descuento_aplicado', 'tiempo_en_sitio_min']:
-                mask = np.random.random(self.num_filas) < (self.porcentaje_nulos / 100)
-                df.loc[mask, col] = None
+        # Aplicar nulos si es necesario (excluir IDs y fechas críticas)
+        df = self._aplicar_nulos(df, columnas_excluir=['fecha_pedido', 'pedido_id', 'cliente_id'])
+        
+        return df
         
         return df

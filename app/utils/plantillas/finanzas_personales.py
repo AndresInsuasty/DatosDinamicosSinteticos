@@ -45,9 +45,9 @@ class PlantillaFinanzasPersonales(PlantillaBase):
         df['ratio_ahorro'] = (df['ahorros_mes'] / df['ingresos_mensuales'] * 100).round(2)
         df['ratio_deuda_ingreso'] = (df['deudas_total'] / (df['ingresos_mensuales'] * 12) * 100).round(2)
         
-        if self.porcentaje_nulos > 0:
-            for col in ['deudas_total', 'emergency_fund_meses', 'patrimonio_neto']:
-                mask = np.random.random(self.num_filas) < (self.porcentaje_nulos / 100)
-                df.loc[mask, col] = None
+        # Aplicar nulos si es necesario (excluir IDs y fechas críticas)
+        df = self._aplicar_nulos(df, columnas_excluir=['fecha', 'usuario_id'])
+        
+        return df
         
         return df

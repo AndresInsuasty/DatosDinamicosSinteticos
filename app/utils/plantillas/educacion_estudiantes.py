@@ -47,9 +47,9 @@ class PlantillaEducacionEstudiantes(PlantillaBase):
                                            bins=[0, 60, 70, 80, 90, 100], 
                                            labels=['Insuficiente', 'Regular', 'Bueno', 'Muy Bueno', 'Excelente'])
         
-        if self.porcentaje_nulos > 0:
-            for col in ['horas_estudio_semana', 'participacion_clase']:
-                mask = np.random.random(self.num_filas) < (self.porcentaje_nulos / 100)
-                df.loc[mask, col] = None
+        # Aplicar nulos si es necesario (excluir IDs críticos)
+        df = self._aplicar_nulos(df, columnas_excluir=['estudiante_id'])
+        
+        return df
         
         return df

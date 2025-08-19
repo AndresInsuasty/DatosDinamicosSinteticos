@@ -39,10 +39,7 @@ class PlantillaVentasSupermercado(PlantillaBase):
         df['total'] = (df['cantidad'] * df['precio_unitario'] * 
                       (1 - df['descuento_pct'] / 100)).round(2)
         
-        # Aplicar nulos si es necesario
-        if self.porcentaje_nulos > 0:
-            for col in ['descuento_pct']:
-                mask = np.random.random(self.num_filas) < (self.porcentaje_nulos / 100)
-                df.loc[mask, col] = None
+        # Aplicar nulos si es necesario (excluir IDs y fechas críticas)
+        df = self._aplicar_nulos(df, columnas_excluir=['fecha_venta', 'ticket_id'])
         
         return df

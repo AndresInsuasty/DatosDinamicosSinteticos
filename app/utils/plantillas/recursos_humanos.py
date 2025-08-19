@@ -44,9 +44,9 @@ class PlantillaRecursosHumanos(PlantillaBase):
         # Calcular antigüedad en años
         df['antiguedad_anos'] = ((pd.Timestamp.now() - pd.to_datetime(df['fecha_ingreso'])).dt.days / 365.25).round(1)
         
-        if self.porcentaje_nulos > 0:
-            for col in ['evaluacion_desempeno', 'horas_extras_mes']:
-                mask = np.random.random(self.num_filas) < (self.porcentaje_nulos / 100)
-                df.loc[mask, col] = None
+        # Aplicar nulos si es necesario (excluir IDs y fechas críticas)
+        df = self._aplicar_nulos(df, columnas_excluir=['empleado_id', 'fecha_ingreso'])
+        
+        return df
         
         return df

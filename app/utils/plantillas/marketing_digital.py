@@ -47,9 +47,9 @@ class PlantillaMarketingDigital(PlantillaBase):
         df['cpa'] = np.where(df['conversiones'] > 0, (df['costo_total'] / df['conversiones']).round(2), 0)
         df['roas'] = np.where(df['costo_total'] > 0, (df['revenue_generado'] / df['costo_total']).round(2), 0)
         
-        if self.porcentaje_nulos > 0:
-            for col in ['revenue_generado', 'tiempo_conversion_hrs']:
-                mask = np.random.random(self.num_filas) < (self.porcentaje_nulos / 100)
-                df.loc[mask, col] = None
+        # Aplicar nulos si es necesario (excluir IDs y fechas críticas)
+        df = self._aplicar_nulos(df, columnas_excluir=['fecha_campana', 'campana_id'])
+        
+        return df
         
         return df
