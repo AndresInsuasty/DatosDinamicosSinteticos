@@ -3,7 +3,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import io
 
 from utils.generacion import generar_dataframe
 from utils.descargas import (
@@ -15,23 +14,29 @@ from utils.plantillas import PLANTILLAS_DISPONIBLES
 st.title("Generador de Datos Sintéticos")
 
 with st.sidebar:
-    # Selector de modo
+    # Selector de modo — Plantillas es la opción por defecto
     modo = st.radio(
         "Modo de generación:",
-        ["Personalizado", "Plantillas"],
-        help="Personalizado: configura tus propias columnas. Plantillas: usa estructuras predefinidas."
+        ["Plantillas", "Personalizado"],
+        help="Plantillas: usa estructuras predefinidas. Personalizado: configura tus propias columnas."
     )
 
     with st.form("form_datos"):
         if modo == "Plantillas":
+            nombres_plantillas = sorted(list(PLANTILLAS_DISPONIBLES.keys()))
             plantilla_seleccionada = st.selectbox(
                 "Selecciona una plantilla:",
-                options=sorted(list(PLANTILLAS_DISPONIBLES.keys())),
+                options=nombres_plantillas,
                 help="Plantillas predefinidas con estructuras de datos específicas"
             )
+            # Mostrar descripción de la plantilla seleccionada
+            desc = PLANTILLAS_DISPONIBLES[plantilla_seleccionada](
+                num_filas=1, semilla=0
+            ).descripcion
+            st.caption(f"ℹ️ {desc}")
 
         # Parámetros comunes para ambos modos
-        num_filas = st.number_input("Número de registros (filas)", min_value=1, value=10)
+        num_filas = st.number_input("Número de registros (filas)", min_value=1, value=100)
         semilla = st.number_input("Número de la suerte (semilla)", min_value=0, value=42)
         porcentaje_nulos = st.slider("% de nulos/vacíos en los datos", min_value=0, max_value=100, value=0)
         idioma_opcion = st.selectbox("Idioma", options=list(IDIOMAS_DISPONIBLES.keys()), index=0)
@@ -43,7 +48,7 @@ with st.sidebar:
             num_booleans = st.slider("Columnas Booleanas", min_value=0, max_value=5, value=1)
             num_fechas = st.slider("Columnas de Fecha", min_value=0, max_value=5, value=1)
 
-        generar = st.form_submit_button("Generar")
+        generar = st.form_submit_button("Generar", use_container_width=True)
 
 if generar:
     idioma = IDIOMAS_DISPONIBLES[idioma_opcion]
@@ -75,7 +80,9 @@ if generar:
 if "df" in st.session_state and "df_sample" in st.session_state:
     df = st.session_state.df
     sample_df = st.session_state.df_sample
-    st.dataframe(sample_df)
+
+    st.write(f"**Vista previa** ({len(df):,} filas × {len(df.columns)} columnas):")
+    st.dataframe(sample_df, use_container_width=True)
 
     st.write("**Descargar datos en diferentes formatos:**")
     col1, col2, col3, col4, col5 = st.columns(5)
@@ -101,10 +108,10 @@ if "df" in st.session_state and "df_sample" in st.session_state:
         )
 
     with col3:
-        json = preparar_json(df)
+        json_data = preparar_json(df)
         st.download_button(
             label="📋 JSON",
-            data=json,
+            data=json_data,
             file_name="datos_sinteticos.json",
             mime="application/json",
             use_container_width=True

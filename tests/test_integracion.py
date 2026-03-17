@@ -62,7 +62,7 @@ class TestIntegracion:
         ("parquet", preparar_parquet),
         ("sqlite", preparar_sqlite)
     ])
-    def test_exportacion_formatos(self, funcion):
+    def test_exportacion_formatos(self, formato, funcion):
         """Test exportación a diferentes formatos."""
         dataframe = generar_dataframe(
             num_filas=10,
@@ -111,7 +111,7 @@ class TestIntegracion:
 
         # Test exportación
         csv_data = preparar_csv(dataframe)
-        assert isinstance(csv_data, str)
+        assert isinstance(csv_data, bytes)
         assert len(csv_data) > 0
 
         json_data = preparar_json(dataframe)
