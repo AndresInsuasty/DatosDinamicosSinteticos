@@ -1,4 +1,4 @@
-name: Pylint
+name: CI
 
 on: [push]
 
@@ -16,5 +16,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: uv sync --extra dev
+
+    - name: Run tests with coverage
+      run: uv run pytest --cov --cov-fail-under=70 --cov-report=term-missing
+
     - name: Analysing the code with pylint
-      run: uv run pylint $(git ls-files '*.py')
+      run: uv run pylint $(git ls-files '*.py') --fail-under=8

@@ -81,7 +81,7 @@ class PlantillaTicketsServicio(PlantillaBase):
             'satisfaccion_cliente': np.where(
                 np.isin(estado_arr, ['Resuelto', 'Cerrado']),
                 np.random.randint(1, 6, self.num_filas),   # 1-5 solo si resuelto
-                None
+                None if self.porcentaje_nulos > 0 else 0   # 0 = sin calificar cuando no hay nulos
             ),
         }
 
